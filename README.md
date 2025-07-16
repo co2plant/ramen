@@ -1,42 +1,5 @@
-# 🍜 나를 위한 라멘 맛집 찾기
+# Vue 3 + Vite
 
-이 프로젝트는 서울의 다양한 라멘 맛집을 쉽고 재미있게 탐색할 수 있는 웹 애플리케이션입니다. 위치 기반 필터, AI 리뷰 요약, 페어링 추천 등 다양한 기능을 제공합니다.
+This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-## 주요 기능
-
-- **라멘집 목록 및 상세 정보**: 서울의 인기 라멘집을 종류, 가격, 거리 등으로 필터링하여 볼 수 있습니다.
-- **상세 검색**: 라멘 종류, 최대 가격, 최대 거리로 원하는 맛집을 빠르게 찾을 수 있습니다.
-- **별점/거리순 정렬**: 별점순, 거리순으로 라멘집을 정렬할 수 있습니다.
-- **리뷰 및 별점**: 각 라멘집의 대표 메뉴와 실제 리뷰, 별점을 확인할 수 있습니다.
-- **AI 리뷰 요약**: Gemini API를 활용해 리뷰를 한두 문장으로 요약해줍니다.
-- **AI 페어링 추천**: 대표 메뉴와 어울리는 사이드/음료를 AI가 추천합니다.
-- **로그인/리뷰 작성**: 라오타 계정으로 로그인하면 직접 리뷰와 별점을 남길 수 있습니다.
-
-## 사용 방법
-
-1. `index.html` 파일을 브라우저에서 엽니다.
-2. 위치 정보 제공을 허용하면 거리 기반 필터와 정렬이 활성화됩니다.
-3. 좌측 필터에서 라멘 종류, 가격, 거리 조건을 선택해 맛집을 탐색하세요.
-4. 라멘집 카드를 클릭하면 상세 정보, 리뷰, AI 기능, 리뷰 작성 폼이 나타납니다.
-5. [라오타 로그인] 버튼으로 로그인 후 리뷰를 남길 수 있습니다. (데모 계정: `raota`, `expert`)
-
-## AI 기능 안내
-- **AI 리뷰 요약/페어링 추천**은 Google Gemini API를 호출하지만, 실제 API 키는 비워져 있습니다. 직접 사용하려면 `index.html` 내 `callGemini` 함수의 `apiKey`에 본인 키를 입력하세요.
-
-## 기술 스택
-- HTML, CSS (TailwindCSS CDN)
-- 순수 JavaScript (프레임워크 없이 동작)
-- Google Fonts (도현, 고운돋움)
-
-## 참고/제약 사항
-- 모든 데이터(라멘집, 리뷰, 유저)는 index.html 내에 하드코딩되어 있습니다.
-- 위치 정보는 실제 위치 대신 강남역(37.4979, 127.0276)으로 고정됩니다.
-- AI 기능은 실제 API 키가 없으면 동작하지 않습니다.
-
-## 데모 계정
-- 아이디: `raota` (이름: 라멘오타쿠)
-- 아이디: `expert` (이름: 라멘전문가)
-
----
-
-문의: [프로젝트 소스 내 이슈 등록]
+Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
