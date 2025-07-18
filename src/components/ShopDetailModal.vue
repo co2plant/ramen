@@ -16,11 +16,39 @@
           </li>
         </ul>
       </div>
+      <div class="mt-8">
+        <h3 class="font-title text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2 text-gray-200">🎤 라오타 리뷰</h3>
+        <ReviewList :reviews="reviews" />
+      </div>
+      <div v-if="user" class="mt-8">
+        <h3 class="font-title text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2 text-gray-200">🖋️ 리뷰 작성</h3>
+        <ReviewForm :menu="shop.menu" :user="user" @review-add="addReview" />
+      </div>
+      <AIFeatures :shop="shop" :summary="aiSummary" :pairing="aiPairing" @ai-summary="handleAISummary" @ai-pairing="handleAIPairing" />
       <!-- 리뷰, AI, 리뷰작성 등은 추후 추가 -->
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({ shop: Object });
+import { ref, computed } from 'vue';
+const props = defineProps({ shop: Object, user: String });
+import ReviewList from './ReviewList.vue';
+import ReviewForm from './ReviewForm.vue';
+import AIFeatures from './AIFeatures.vue';
+
+const reviews = ref([...props.shop.reviews]);
+const aiSummary = ref('');
+const aiPairing = ref('');
+function addReview(review) {
+  reviews.value.push(review);
+}
+function handleAISummary() {
+  // 실제 AI 호출은 부모(App.vue)에서 처리하도록 이벤트 emit
+  emit('ai-summary');
+}
+function handleAIPairing() {
+  emit('ai-pairing');
+}
+const emit = defineEmits(['close', 'ai-summary', 'ai-pairing']);
 </script> 
