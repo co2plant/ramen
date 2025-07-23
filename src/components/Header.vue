@@ -48,9 +48,3 @@ defineProps({
 
 defineEmits(['login', 'logout']);
 </script>
-
-<style scoped>
-.font-title {
-  font-family: 'Do Hyeon', sans-serif;
-}
-</style>

@@ -1,3 +1,46 @@
+<template>
+  <div class="min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 flex flex-col">
+    <Header 
+      :loggedInUser="loggedInUser" 
+      @login="showLogin = true" 
+      @logout="handleLogout" 
+    />
+    
+    <main class="flex-1 container mx-auto max-w-7xl p-4 mt-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <FilterSidebar
+          :categories="categories"
+          :selectedCategory="filters.category"
+          :maxPrice="filters.maxPrice"
+          :maxDistance="filters.maxDistance"
+          @update:category="v => filters.category = v"
+          @update:maxPrice="v => filters.maxPrice = Number(v)"
+          @update:maxDistance="v => filters.maxDistance = Number(v)"
+          @reset="resetFilters"
+        />
+        <div class="w-full lg:w-3/4 xl:w-4/5">
+          <SortButtons :sortBy="sortBy" @sort-change="setSort" />
+          <ShopList :shops="filteredShops" @select-shop="openModal" />
+        </div>
+      </div>
+      
+      <ShopDetailModal
+        v-if="selectedShop"
+        :shop="selectedShop"
+        :user="loggedInUser?.name"
+        :aiSummary="aiSummary"
+        :aiPairing="aiPairing"
+        @close="selectedShop = null"
+        @ai-summary="handleAISummary"
+        @ai-pairing="handleAIPairing"
+      />
+      <LoginModal v-if="showLogin" @login="handleLogin" @close="showLogin = false" />
+    </main>
+    
+    <Footer />
+  </div>
+</template>
+
 <script setup>
 import { ref, computed } from 'vue';
 import { ramenShops, raotaUsers } from './data';
@@ -106,55 +149,3 @@ async function handleAIPairing() {
 }
 </script>
 
-<template>
-  <div class="min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 flex flex-col">
-    <!-- Header 컴포넌트 적용 -->
-    <Header 
-      :loggedInUser="loggedInUser" 
-      @login="showLogin = true" 
-      @logout="handleLogout" 
-    />
-    
-    <!-- Main Content -->
-    <main class="flex-1 container mx-auto max-w-7xl p-4 mt-8">
-      <div class="flex flex-col lg:flex-row gap-8">
-        <FilterSidebar
-          :categories="categories"
-          :selectedCategory="filters.category"
-          :maxPrice="filters.maxPrice"
-          :maxDistance="filters.maxDistance"
-          @update:category="v => filters.category = v"
-          @update:maxPrice="v => filters.maxPrice = Number(v)"
-          @update:maxDistance="v => filters.maxDistance = Number(v)"
-          @reset="resetFilters"
-        />
-        <div class="w-full lg:w-3/4 xl:w-4/5">
-          <SortButtons :sortBy="sortBy" @sort-change="setSort" />
-          <ShopList :shops="filteredShops" @select-shop="openModal" />
-        </div>
-      </div>
-      
-      <!-- Modals -->
-      <ShopDetailModal
-        v-if="selectedShop"
-        :shop="selectedShop"
-        :user="loggedInUser?.name"
-        :aiSummary="aiSummary"
-        :aiPairing="aiPairing"
-        @close="selectedShop = null"
-        @ai-summary="handleAISummary"
-        @ai-pairing="handleAIPairing"
-      />
-      <LoginModal v-if="showLogin" @login="handleLogin" @close="showLogin = false" />
-    </main>
-    
-    <!-- Footer 컴포넌트 적용 -->
-    <Footer />
-  </div>
-</template>
-
-<style>
-.font-title {
-  font-family: 'Do Hyeon', sans-serif;
-}
-</style>
