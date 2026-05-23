@@ -8,7 +8,8 @@
         <h3 class="font-title text-2xl font-bold mb-1 text-gray-100">{{ shop.name }}</h3>
         <span class="text-sm font-bold bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-full border border-orange-500/30">⭐ {{ shop.avg_rating.toFixed(1) }}</span>
       </div>
-      <p class="text-gray-400 text-sm mb-3">{{ shop.category }}</p>
+      <p class="text-gray-400 text-sm mb-1">{{ shop.category }}</p>
+      <p class="text-gray-400 text-sm mb-3">📍 {{ formatDistance(shop.distance) }}</p>
       <div class="flex justify-between items-center text-sm text-gray-300">
         <span>{{ shop.menu[0].name }}</span>
         <span class="font-semibold text-gray-100">₩{{ shop.menu[0].price.toLocaleString() }}</span>
@@ -18,5 +19,6 @@
 </template>
 
 <script setup>
-const props = defineProps({ shop: Object });
-</script> 
+import { formatDistance } from '../utils/distance';
+defineProps({ shop: Object });
+</script>

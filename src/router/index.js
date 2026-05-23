@@ -1,12 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-
+// 라우터 확장 시 사용 예정
 const routes = [
-    { path : '/', Component: () => import('../views/Home.vue') },
+  { path: '/', component: () => import('../App.vue') },
 ]
 
-const router = createRouter({
-    history : createWebHistory(),
-    routes,
-})
-
-export default router
+export default routes
