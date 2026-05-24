@@ -24,14 +24,14 @@
         <h3 class="font-title text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2 text-gray-200">🖋️ 리뷰 작성</h3>
         <ReviewForm :menu="shop.menu" :user="user" @review-add="emit('review-add', $event)" />
       </div>
-      <AIFeatures :shop="shop" :summary="aiSummary" :pairing="aiPairing" @ai-summary="handleAISummary" @ai-pairing="handleAIPairing" />
+      <AIFeatures :shop="shop" :summary="aiSummary"  :pairing="aiPairing" :loading="aiLoading" @ai-summary="handleAISummary" @ai-pairing="handleAIPairing" />
       <!-- 리뷰, AI, 리뷰작성 등은 추후 추가 -->
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({ shop: Object, user: String, aiSummary: String, aiPairing: String });
+const props = defineProps({ shop: Object, user: String, aiSummary: String, aiPairing: String, aiLoading: Boolean });
 import ReviewList from './ReviewList.vue';
 import ReviewForm from './ReviewForm.vue';
 import AIFeatures from './AIFeatures.vue';

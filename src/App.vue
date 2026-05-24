@@ -30,6 +30,7 @@
         :user="loggedInUser?.name"
         :aiSummary="aiSummary"
         :aiPairing="aiPairing"
+        :aiLoading="aiLoading"
         @close="selectedShop = null"
         @ai-summary="handleAISummary"
         @ai-pairing="handleAIPairing"
@@ -62,6 +63,28 @@ import SortButtons from './components/SortButtons.vue';
 const STORAGE_KEY = 'ramen-reviews-v1';
 const baseGeo = { lat: 37.4979, lng: 127.0276 };
 
+function isValidReview(review) {
+  if (!review || typeof review !== 'object') return false;
+  const hasUser = typeof review.user === 'string' && review.user.trim().length > 0;
+  const hasMenu = typeof review.menu === 'string' && review.menu.trim().length > 0;
+  const hasComment = typeof review.comment === 'string' && review.comment.trim().length > 0;
+  const rating = Number(review.rating);
+  return hasUser && hasMenu && hasComment && Number.isFinite(rating) && rating >= 1 && rating <= 5;
+}
+
+function sanitizeReviews(input, fallback) {
+  if (!Array.isArray(input)) return fallback;
+  const normalized = input
+    .filter(isValidReview)
+    .map((review) => ({
+      user: review.user.trim(),
+      menu: review.menu.trim(),
+      rating: Math.round(Number(review.rating)),
+      comment: review.comment.trim(),
+    }));
+  return normalized.length > 0 ? normalized : fallback;
+}
+
 const shops = ref(ramenShops.map((shop) => ({ ...shop })));
 const loggedInUser = ref(null);
 const selectedShop = ref(null);
@@ -70,13 +93,14 @@ const loginError = ref('');
 
 const aiSummary = ref('');
 const aiPairing = ref('');
+const aiLoading = ref(false);
 
 if (typeof window !== 'undefined') {
   try {
     const persistedReviews = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
     shops.value = shops.value.map((shop) => ({
       ...shop,
-      reviews: persistedReviews[String(shop.id)] ?? shop.reviews,
+      reviews: sanitizeReviews(persistedReviews[String(shop.id)], shop.reviews),
     }));
   } catch (error) {
     console.error('리뷰 저장소 파싱 실패:', error);
@@ -200,17 +224,21 @@ async function callGemini(prompt) {
 }
 
 async function handleAISummary() {
-  if (!selectedShop.value) return;
+  if (!selectedShop.value || aiLoading.value) return;
+  aiLoading.value = true;
   aiSummary.value = 'AI가 리뷰를 분석하고 있습니다...';
   const allReviewsText = selectedShop.value.reviews.map((r) => `- ${r.comment}`).join('\n');
   const prompt = `다음은 '${selectedShop.value.name}' 라멘 가게에 대한 전문가들의 리뷰입니다. 이 리뷰들을 한두 문장의 핵심 내용으로 요약해주세요:\n\n${allReviewsText}`;
   aiSummary.value = await callGemini(prompt);
+  aiLoading.value = false;
 }
 
 async function handleAIPairing() {
-  if (!selectedShop.value) return;
+  if (!selectedShop.value || aiLoading.value) return;
+  aiLoading.value = true;
   aiPairing.value = 'AI가 어울리는 조합을 찾고 있습니다...';
   const prompt = `'${selectedShop.value.name}'의 대표 메뉴인 ${selectedShop.value.category} 라멘과 가장 잘 어울리는 사이드 메뉴나 음료를 추천해주고, 그 이유를 간단히 설명해주세요.`;
   aiPairing.value = await callGemini(prompt);
+  aiLoading.value = false;
 }
 </script>
