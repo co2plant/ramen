@@ -6,7 +6,7 @@
       <p class="text-xs text-gray-400 mb-3">데모 계정: raota, expert</p>
       <form @submit.prevent="onLogin">
         <input v-model="username" type="text" placeholder="아이디를 입력하세요 (예: raota)" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500">
-        <p v-if="error" class="text-red-400 text-xs mb-2">{{ error }}</p>
+        <p v-if="error || errorMessage" class="text-red-400 text-xs mb-2">{{ error || errorMessage }}</p>
         <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition">로그인</button>
       </form>
       <button class="absolute top-4 right-5 text-gray-400 hover:text-white text-3xl" @click="$emit('close')">&times;</button>
@@ -16,9 +16,18 @@
 
 <script setup>
 import { ref } from 'vue';
+
+defineProps({
+  errorMessage: {
+    type: String,
+    default: '',
+  },
+});
+
 const username = ref('');
 const error = ref('');
 const emit = defineEmits(['login', 'close']);
+
 function onLogin() {
   const id = username.value.trim();
   if (!id) {

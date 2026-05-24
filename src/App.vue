@@ -35,7 +35,12 @@
         @ai-pairing="handleAIPairing"
         @review-add="handleReviewAdd"
       />
-      <LoginModal v-if="showLogin" @login="handleLogin" @close="showLogin = false" />
+      <LoginModal
+        v-if="showLogin"
+        :errorMessage="loginError"
+        @login="handleLogin"
+        @close="closeLogin"
+      />
     </main>
 
     <Footer />
@@ -57,37 +62,47 @@ import SortButtons from './components/SortButtons.vue';
 const STORAGE_KEY = 'ramen-reviews-v1';
 const baseGeo = { lat: 37.4979, lng: 127.0276 };
 
-const persistedReviews = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-const initialShops = ramenShops.map((shop) => ({
-  ...shop,
-  reviews: persistedReviews[String(shop.id)] ?? shop.reviews,
-}));
-
-const shops = ref(initialShops);
+const shops = ref(ramenShops.map((shop) => ({ ...shop })));
 const loggedInUser = ref(null);
 const selectedShop = ref(null);
 const showLogin = ref(false);
+const loginError = ref('');
 
 const aiSummary = ref('');
 const aiPairing = ref('');
 
-const categories = ['all', ...new Set(shops.value.map(s => s.category))];
+if (typeof window !== 'undefined') {
+  const persistedReviews = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+  shops.value = shops.value.map((shop) => ({
+    ...shop,
+    reviews: persistedReviews[String(shop.id)] ?? shop.reviews,
+  }));
+}
+
+const categories = ['all', ...new Set(shops.value.map((s) => s.category))];
 const filters = ref({ category: 'all', maxPrice: 20000, maxDistance: 20 });
 const sortBy = ref('rating');
 
 watch(
   shops,
   (next) => {
+    if (typeof window === 'undefined') return;
     const reviewMap = Object.fromEntries(next.map((shop) => [String(shop.id), shop.reviews]));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reviewMap));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(reviewMap));
   },
   { deep: true }
 );
+
+function closeLogin() {
+  showLogin.value = false;
+  loginError.value = '';
+}
 
 function resetFilters() {
   filters.value = { category: 'all', maxPrice: 20000, maxDistance: 20 };
   sortBy.value = 'rating';
 }
+
 function setSort(type) {
   sortBy.value = type;
 }
@@ -95,8 +110,8 @@ function setSort(type) {
 const filteredShops = computed(() => {
   let result = shops.value
     .map((shop) => ({ ...shop, distance: calculateDistance(baseGeo.lat, baseGeo.lng, shop.geo.lat, shop.geo.lng) }))
-    .filter(shop => {
-      const priceMatch = shop.menu.some(m => m.price <= filters.value.maxPrice);
+    .filter((shop) => {
+      const priceMatch = shop.menu.some((m) => m.price <= filters.value.maxPrice);
       const categoryMatch = filters.value.category === 'all' || shop.category === filters.value.category;
       const distanceMatch = shop.distance <= filters.value.maxDistance;
       return priceMatch && categoryMatch && distanceMatch;
@@ -117,21 +132,24 @@ function openModal(shop) {
   aiSummary.value = '';
   aiPairing.value = '';
 }
+
 function handleLogin(userId) {
   const normalizedId = userId.trim().toLowerCase();
-  const user = raotaUsers.find(u => u.id === normalizedId);
+  const user = raotaUsers.find((u) => u.id === normalizedId);
+
   if (!user) {
-    alert('존재하지 않는 데모 계정입니다. raota 또는 expert를 입력해주세요.');
+    loginError.value = '존재하지 않는 데모 계정입니다. raota 또는 expert를 입력해주세요.';
     return;
   }
 
   loggedInUser.value = user;
+  loginError.value = '';
   showLogin.value = false;
 }
+
 function handleLogout() {
   loggedInUser.value = null;
 }
-
 
 function handleReviewAdd(review) {
   if (!selectedShop.value) return;
@@ -161,7 +179,7 @@ async function callGemini(prompt) {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`API 호출 실패: ${response.status}`);
     const result = await response.json();
@@ -175,7 +193,7 @@ async function callGemini(prompt) {
 async function handleAISummary() {
   if (!selectedShop.value) return;
   aiSummary.value = 'AI가 리뷰를 분석하고 있습니다...';
-  const allReviewsText = selectedShop.value.reviews.map(r => `- ${r.comment}`).join('\n');
+  const allReviewsText = selectedShop.value.reviews.map((r) => `- ${r.comment}`).join('\n');
   const prompt = `다음은 '${selectedShop.value.name}' 라멘 가게에 대한 전문가들의 리뷰입니다. 이 리뷰들을 한두 문장의 핵심 내용으로 요약해주세요:\n\n${allReviewsText}`;
   aiSummary.value = await callGemini(prompt);
 }

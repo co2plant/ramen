@@ -24,6 +24,10 @@ cp .env.example .env
 VITE_GEMINI_API_KEY=YOUR_KEY
 ```
 
+## 데모 계정
+- `raota`
+- `expert`
+
 ## 기술 스택
 - Vue 3
 - Vite
@@ -31,4 +35,6 @@ VITE_GEMINI_API_KEY=YOUR_KEY
 
 ## 참고
 - 기본 기준 위치는 강남역(37.4979, 127.0276)입니다.
-- 리뷰는 브라우저 localStorage에 저장됩니다.
+- 리뷰는 브라우저 localStorage(`ramen-reviews-v1`)에 저장됩니다.
+- AI 기능은 `VITE_GEMINI_API_KEY`가 없으면 안내 메시지를 출력하고 실제 호출하지 않습니다.
+- `src/router/index.js`는 향후 페이지 확장을 위한 라우트 정의 초안입니다(현재 앱은 `App.vue` 단일 진입).
