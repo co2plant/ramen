@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 flex flex-col">
     <Header
       :loggedInUser="loggedInUser"
-      @login="showLogin = true"
+      @login="openLogin"
       @logout="handleLogout"
     />
 
@@ -72,11 +72,15 @@ const aiSummary = ref('');
 const aiPairing = ref('');
 
 if (typeof window !== 'undefined') {
-  const persistedReviews = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
-  shops.value = shops.value.map((shop) => ({
-    ...shop,
-    reviews: persistedReviews[String(shop.id)] ?? shop.reviews,
-  }));
+  try {
+    const persistedReviews = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '{}');
+    shops.value = shops.value.map((shop) => ({
+      ...shop,
+      reviews: persistedReviews[String(shop.id)] ?? shop.reviews,
+    }));
+  } catch (error) {
+    console.error('리뷰 저장소 파싱 실패:', error);
+  }
 }
 
 const categories = ['all', ...new Set(shops.value.map((s) => s.category))];
@@ -92,6 +96,11 @@ watch(
   },
   { deep: true }
 );
+
+function openLogin() {
+  loginError.value = '';
+  showLogin.value = true;
+}
 
 function closeLogin() {
   showLogin.value = false;
